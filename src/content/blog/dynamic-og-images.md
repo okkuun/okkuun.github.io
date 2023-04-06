@@ -14,6 +14,14 @@ description: New feature in AstroPaper v1.4.0, introducing dynamic OG image gene
 
 New feature in AstroPaper v1.4.0, introducing dynamic OG image generation for blog posts.
 
+```python
+import numpy as np
+
+a = np.array([
+  [2, 3, 4]
+])
+```
+
 ## Table of contents
 
 ## Intro
@@ -39,7 +47,7 @@ Dynamic OG images will be generated at build time for blog posts that
 
 ## Anatomy of AstroPaper dynamic OG image
 
-Dynamic OG image of AstroPaper includes _the blog post title_, _author name_ and _site title_. Author name and site title will be retrieved via `SITE.author` and `SITE.title` of **"src/config.ts"** file. The title is generated from the blog post frontmatter `title`.  
+Dynamic OG image of AstroPaper includes _the blog post title_, _author name_ and _site title_. Author name and site title will be retrieved via `SITE.author` and `SITE.title` of **"src/config.ts"** file. The title is generated from the blog post frontmatter `title`.
 ![Example Dynamic OG Image link](https://user-images.githubusercontent.com/53733092/209704501-e9c2236a-3f4d-4c67-bab3-025aebd63382.png)
 
 ## Limitations

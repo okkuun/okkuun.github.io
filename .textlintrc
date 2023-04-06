@@ -1,0 +1,31 @@
+{
+  "filters": {},
+  "rules": {
+    "no-dropping-the-ra": true,
+    "preset-ja-technical-writing": true,
+    "ja-no-orthographic-variants": true,
+    "no-doubled-joshi": {
+      "min_interval" : 1,
+      "strict": false,
+      "allow": ["も"],
+      "separatorCharacters": [
+          ".",
+          "．",
+          "。",
+          "?",
+          "!",
+          "？",
+          "！"
+      ],
+      "commaCharacters": [
+          "、",
+          "，"
+      ]
+    },
+    "no-start-duplicated-conjunction": {
+      "interval" : 3
+    },
+    "ja-no-abusage": true,
+    "ja-no-weak-phrase": false
+  }
+}

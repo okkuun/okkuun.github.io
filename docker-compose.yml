@@ -1,0 +1,10 @@
+version: '3'
+services:
+  app:
+    build: ./
+    user: root
+    volumes:
+      - ./:/app:delegated
+    tty: true
+    ports:
+      - "8888:8888"
