@@ -29,7 +29,7 @@
     display: block;
   }
   body {
-    @apply flex min-h-screen flex-col bg-skin-fill font-mono text-skin-base
+    @apply flex min-h-screen flex-col bg-skin-fill text-skin-base
     selection:bg-skin-accent selection:bg-opacity-70 selection:text-skin-inverted;
   }
   section,
@@ -51,7 +51,7 @@
   .prose {
     @apply prose-headings:!mb-3 prose-headings:!text-skin-base
     prose-h3:italic prose-p:!text-skin-base
-    prose-a:!text-skin-base prose-a:!decoration-dashed prose-a:underline-offset-8
+    prose-a:!text-skin-base prose-a:!decoration-solid prose-a:underline-offset-2
     hover:prose-a:text-skin-accent prose-blockquote:!border-l-skin-accent
     prose-blockquote:border-opacity-50 prose-blockquote:opacity-80
     prose-figcaption:!text-skin-base prose-figcaption:opacity-70
