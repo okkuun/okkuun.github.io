@@ -6,13 +6,13 @@ import { Resvg } from "@resvg/resvg-js";
 const fetchFonts = async () => {
   // Regular Font
   const fontFileRegular = await fetch(
-    "https://www.fontsquirrel.com/fonts/download/open-sans/OpenSans-Regular.ttf"
+    "https://www.1001fonts.com/download/font/ibm-plex-mono.regular.ttf"
   );
   const fontRegular: ArrayBuffer = await fontFileRegular.arrayBuffer();
 
   // Bold Font
   const fontFileBold = await fetch(
-    "https://www.fontsquirrel.com/fonts/download/open-sans/OpenSans-Bold.ttf"
+    "https://www.1001fonts.com/download/font/ibm-plex-mono.bold.ttf"
   );
   const fontBold: ArrayBuffer = await fontFileBold.arrayBuffer();
 
@@ -80,7 +80,8 @@ const ogImage = (text: string) => {
               overflow: "hidden",
             }}
           >
-            {text}
+            {/* {text} */}
+            {SITE.title}
           </p>
           <div
             style={{
@@ -105,9 +106,9 @@ const ogImage = (text: string) => {
               </span>
             </span>
 
-            <span style={{ overflow: "hidden", fontWeight: "bold" }}>
+            {/* <span style={{ overflow: "hidden", fontWeight: "bold" }}>
               {SITE.title}
-            </span>
+            </span> */}
           </div>
         </div>
       </div>
