@@ -4,7 +4,7 @@ export const SITE: Site = {
   website: "https://okkuun.github.io/",
   author: "okkuun",
   desc: "This is ",
-  title: "Retro Street",
+  title: "Roundabout.",
   ogImage: "",
   lightAndDarkMode: true,
   postPerPage: 5,
@@ -52,7 +52,7 @@ export const SOCIALS: SocialObjects = [
     name: "Mail",
     href: "taka.okukubo@gmail.com",
     linkTitle: `Send an email to ${SITE.title}`,
-    active: true,
+    active: false,
   },
   {
     name: "Twitch",
