@@ -120,18 +120,18 @@ const options: SatoriOptions = {
   height: 630,
   embedFont: false,
   fonts: [
-    {
-      name: "IBM Plex Mono",
-      data: fontRegular,
-      weight: 400,
-      style: "normal",
-    },
-    {
-      name: "IBM Plex Mono",
-      data: fontBold,
-      weight: 600,
-      style: "normal",
-    },
+    // {
+    //   name: "IBM Plex Mono",
+    //   data: fontRegular,
+    //   weight: 400,
+    //   style: "normal",
+    // },
+    // {
+    //   name: "IBM Plex Mono",
+    //   data: fontBold,
+    //   weight: 600,
+    //   style: "normal",
+    // },
   ],
 };
 
