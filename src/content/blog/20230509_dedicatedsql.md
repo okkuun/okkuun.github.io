@@ -1,7 +1,7 @@
 ---
 author: Takafumi Okukubo
 pubDatetime: 2023-05-14
-title: Synapse Dedicated SQL Pool使用時に知っておけばなんとかなること
+title: Synapse Dedicated SQL Poolは「分散」と「Index」の組み合わせで最適化する
 postSlug: dedicated-tips
 featured: false
 draft: false
@@ -11,7 +11,7 @@ ogImage: ""
 description: AzureのDedicated(専用) SQL Poolを使う時、最低限知っておけばなんとかなりそうなことをまとめました。
 ---
 
-[Dedicated SQL Pool](https://learn.microsoft.com/en-us/azure/synapse-analytics/sql-data-warehouse/sql-data-warehouse-overview-what-is)は Microsoft Azure のデータウェアハウス用のデータベースです。
+[Dedicated SQL Pool](https://learn.microsoft.com/en-us/azure/synapse-analytics/sql-data-warehouse/sql-data-warehouse-overview-what-is)は Microsoft Azure のサービスの 1 つで、データウェアハウス向けに使用されます。
 要は Snowflake や Redshift の Azure 版です。
 
 <!-- 今まで約一年半ほど使用してきて、ようやく慣れてきた感が出てきましたが、今後は別のデータウェアハウスのサービスを使用することになりました。せっかくなので、これまでの学びや公式情報にはないけれど経験上こうしたら早くなった気がするということまでまとめていきます。 -->
@@ -19,7 +19,7 @@ description: AzureのDedicated(専用) SQL Poolを使う時、最低限知って
 本記事では Dedicated SQL Pool を初めて触る方向けに、最低限の tips をまとめます。
 現代において異様に敵対視されている「勘と経験」に沿った内容もあるので、**誤りに気がついた方はコメントください**。
 
-なお理解がより進んでいる方は、[Microsoft のベストプラクティス](https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/synapse-analytics/sql/best-practices-dedicated-sql-pool.md)を読むと良いです。
+理解がより進んでいる方は、[Microsoft のベストプラクティス](https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/synapse-analytics/sql/best-practices-dedicated-sql-pool.md)を読むと良いです。
 
 ※この記事を書いた日から時間が経ち、古い情報になっている可能性があります。あらかじめご了承ください。
 
@@ -92,10 +92,10 @@ WITH
 1 つ目の`ROUND_ROBIN`は単純で、データをランダムに 60 個のコンピュートノードに分散させます。
 デフォルトではこちらが指定されるみたいです。
 ノードごとにデータ量の偏りが発生することもないため、難しいことを考えずに指定できるという意味では楽チンです。
-後述する`HASH`のようなアルゴリズムも存在しないため、テーブルの作成や更新はこちらの手法の方が高速である可能性も高いです。
+後述する`HASH`のようなアルゴリズムを通すこともないため、純粋にテーブルを作成したり、この手法で設計されたテーブルに INSERT するのは高速である可能性も高いです。
 
-一方で、ランダムに分散されてしまうので、特に JOIN で特定のカラムを使用する際、ノード間を跨ってデータを探索しなくてはなりません。
-言い換えると、`ROUND_ROBIN`で作成されたテーブルを JOIN などに使用する場合は、使用するカラムに従ってデータを並び替えるが発生し、処理効率を低下させる原因になります。
+一方で、この手法を用いて分散させたテーブルを使用した JOIN や集計が非効率になることを考慮した方が良いです。
+`ROUND_ROBIN`で作成されたテーブルを JOIN などに使用する場合は、使用するカラムに従ってデータを並び替えるが発生し、処理効率を低下させる原因になるためです。
 作成したテーブルを基に、別のテーブルへの挿入などが場合は、次に紹介する`HASH`を使用した方が計算効率を向上させる可能性があります。
 
 ### `HASH`
@@ -112,7 +112,7 @@ WITH
 ;
 ```
 
-（複数カラムの指定も可能ですが、[管理者権限で設定が必要](https://learn.microsoft.com/ja-jp/sql/t-sql/statements/create-materialized-view-as-select-transact-sql?view=azure-sqldw-latest#distribution-option)です。）
+（[管理者権限で設定](https://learn.microsoft.com/ja-jp/sql/t-sql/statements/create-materialized-view-as-select-transact-sql?view=azure-sqldw-latest#distribution-option)すれば、複数カラムの指定も可能です。）
 
 ```sql
 CREATE TABLE [Shema名].[Table名]
@@ -131,10 +131,10 @@ WITH
 このような設計にすることで、指定したカラムが JOIN の結合キーとなるときや、GROUP BY で集計するときに大きな効果を発揮します。
 例えば JOIN する際、結合キーの同じ値が属しているノード同士を突き合わせれば、ノード間をまたいでデータを検索する必要がなくなります。
 
-ただ`HASH`も決して万能ではなく、上記のテーブル例だと`HASH([IsCashless])`とするのは得策ではありません。
+ただ`HASH`も決して万能ではなく、今回のテーブル例だと`HASH([IsCashless])`とするのは得策ではありません。
 `IsCashless`の値の種類は`0`と`1`(と`NULL`)しか存在しないためです。
 指定したカラムを基に各コンピュートノードへ分散配置するとき、値の種類が 60 個よりも極端に少ないと、ノードが 60 個あるうちの数個しか利用しないことになり、分散させる意味がなくなってしまいます。
-他にも日付列や`NULL`の多いカラムは分散に使用するカラムとして指定するべきではありません。
+他にも日付列や`NULL`の多いカラムは分散に使用するカラムとして指定するべきではないみたいです。
 
 また指定するカラムの分布に偏りがあると、分散自体うまくいかない可能性があります。
 1 つのノードにデータが集中することで、多数のノードが計算終了しても 1 つのノードのせいでいつまでも計算完了待ち...なんてことが発生してしまいます。
@@ -160,14 +160,13 @@ WITH
 60 個のノードに分散させるというよりは、その名の通りテーブルを複製します。
 全てのノードに同じデータが配置されるため、ノードを跨いだデータ移動が全く発生しない一方、データ容量が大きいとそれぞれのノードに負担をかけることになります。
 データ量が小さい、テーブルのレコード数が少ない（2GB より小さい）場合は`REPLICATE`を選択すると良さそうです。
-使用する際は`DISTRIBUTION = REPLICATE`と設定します。
 
 <!-- Indexについて説明。非クラスター化Indexもここで -->
 
 ## テーブル作成時に Index の設定が可能
 
 前述の通り、Dedicated SQL Pool ではテーブル作成時に Index を指定できます。
-クラスター化 Index には 3 つの選択肢があります。とりあえず以下のような判断基準で良さそうです。
+Index には 4 つの選択肢があります。とりあえず以下のような判断基準で良さそうです。
 
 - `CLUSTERED COLUMNSTORE INDEX`: 6,000 万行以上のテーブル向け、何も考えたくない場合でもとりあえずこれ
 - `CLUSTERED INDEX ([COLUMN名])`: マスタテーブルのようにカラムに応じて少数のデータを探索したいテーブル向け
@@ -176,7 +175,21 @@ WITH
 
 ### `CLUSTERED COLUMNSTORE INDEX`
 
-列方向にデータを圧縮することで、（横に）大きなデータでも効率よく扱えるようになるようです。
+```sql
+CREATE TABLE [Shema名].[Table名]
+(
+    ...
+)
+WITH
+(
+    CLUSTERED COLUMNSTORE INDEX
+)
+;
+```
+
+<!-- 論理の飛躍あり -->
+
+列方向にデータを圧縮することで、（横にも縦にも）大きなデータでも効率よく扱えるようになるようです。
 ドキュメントには 6,000 万行を超えると期待された Index の効果を発揮できるとあります。
 特に何も指定しなければ（前述のコードから`CLUSTERED COLUMNSTORE INDEX`が取り除かれた場合）、デフォルトとしてこちらの Index が与えられるようです。
 
@@ -197,7 +210,7 @@ WITH
 ;
 ```
 
-指定したカラムに Index を与えます。
+指定したカラムに対する検索を向上させるため、[B-tree インデックス](https://qiita.com/kiyodori/items/f66a545a47dc59dd8839)のような Index を与えるものです。
 ごく少数の行を検索するときに効果的とのことなので、マスタテーブル（例えば、商品 ID と商品名の対応表のようなテーブル）などに適用を考えると良いでしょう。
 
 ### `HEAP`
@@ -216,7 +229,7 @@ WITH
 
 `HEAP`は小さいテーブル使用時に、読み込みを高速化される可能性があります。
 ここでいう「小さいテーブル」は、正直定義が曖昧です。
-6,000 万行以上は`CLUSTERED COLUMNSTORE INDEX`を使うと良いですが、かといって 59,999,999 行だと絶対`HEAP`というわけでもないみたいです。
+6,000 万行以上は`CLUSTERED COLUMNSTORE INDEX`を使うと良いですが、かといって 59,999,999 行だと絶対 NG というわけでもないみたいです。
 もし際どいデータ量である場合は実験して決めるのが良いでしょう。
 
 ### 非クラスター化 Index
@@ -258,7 +271,7 @@ CREATE INDEX sampleIndex ON [Shema名].[Table名]([StoreID])
 ## 終わりに
 
 まとめると、テーブル作成時の`WITH`の設定に気を遣えば、まずはどうにでもなるでしょうということです。
-もちろんもっと高度な tips はたくさんありますので、[Microsoft のベストプラクティス](https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/synapse-analytics/sql/best-practices-dedicated-sql-pool.md)も読んでください。
+もちろんもっと高度な Tips はたくさんありますので、[Microsoft のベストプラクティス](https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/synapse-analytics/sql/best-practices-dedicated-sql-pool.md)も読んでください。
 
 ---
 
