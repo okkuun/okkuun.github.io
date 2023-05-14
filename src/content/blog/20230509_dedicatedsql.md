@@ -11,14 +11,12 @@ ogImage: ""
 description: AzureのDedicated(専用) SQL Poolを使う時、最低限知っておけばなんとかなりそうなことをまとめました。
 ---
 
-[Dedicated SQL Pool](https://learn.microsoft.com/en-us/azure/synapse-analytics/sql-data-warehouse/sql-data-warehouse-overview-what-is)は Microsoft Azure のサービスの 1 つで、データウェアハウス向けに使用されます。
+[Dedicated SQL Pool](https://learn.microsoft.com/en-us/azure/synapse-analytics/sql-data-warehouse/sql-data-warehouse-overview-what-is)は Microsoft Azure のサービスの 1 つで、主にデータウェアハウスに使用されます。
 要は Snowflake や Redshift の Azure 版です。
 
 <!-- 今まで約一年半ほど使用してきて、ようやく慣れてきた感が出てきましたが、今後は別のデータウェアハウスのサービスを使用することになりました。せっかくなので、これまでの学びや公式情報にはないけれど経験上こうしたら早くなった気がするということまでまとめていきます。 -->
 
 本記事では Dedicated SQL Pool を初めて触る方向けに、最低限の tips をまとめます。
-現代において異様に敵対視されている「勘と経験」に沿った内容もあるので、**誤りに気がついた方はコメントください**。
-
 理解がより進んでいる方は、[Microsoft のベストプラクティス](https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/synapse-analytics/sql/best-practices-dedicated-sql-pool.md)を読むと良いです。
 
 ※この記事を書いた日から時間が経ち、古い情報になっている可能性があります。あらかじめご了承ください。
@@ -189,12 +187,13 @@ WITH
 
 <!-- 論理の飛躍あり -->
 
-列方向にデータを圧縮することで、（横にも縦にも）大きなデータでも効率よく扱えるようになるようです。
+データを圧縮することで、大きなデータでも効率よく扱えるようになるようです。
 ドキュメントには 6,000 万行を超えると期待された Index の効果を発揮できるとあります。
 特に何も指定しなければ（前述のコードから`CLUSTERED COLUMNSTORE INDEX`が取り除かれた場合）、デフォルトとしてこちらの Index が与えられるようです。
 
 この Index を使用しているテーブルでは、使用するカラムのみ抽出するように心掛けましょう。
 一部のカラムしか使用しない場合に`SELECT * FROM TABLE`みたいな書き方をすると、せっかくの Index 効果を発揮できません。
+列ごとにグループを作成するようなデータ圧縮の方法をとっているらしく、不要なカラムまで`*`で取得しようとすると、その読み込みだけでオーバーヘッドが生じます。
 
 ### `CLUSTERED INDEX ([COLUMN名])`
 
