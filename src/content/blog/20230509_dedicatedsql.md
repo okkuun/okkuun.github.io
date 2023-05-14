@@ -19,7 +19,7 @@ description: AzureのDedicated(専用) SQL Poolを使う時、最低限知って
 本記事では Dedicated SQL Pool を初めて触る方向けに、最低限の tips をまとめます。
 現代において異様に敵対視されている「勘と経験」に沿った内容もあるので、**誤りに気がついた方はコメントください**。
 
-なお理解がより進んでいる方は、こんな薄いブログなんか読まずに[Microsoft のベストプラクティス](https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/synapse-analytics/sql/best-practices-dedicated-sql-pool.md)を読むと良いです。
+なお理解がより進んでいる方は、[Microsoft のベストプラクティス](https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/synapse-analytics/sql/best-practices-dedicated-sql-pool.md)を読むと良いです。
 
 ※この記事を書いた日から時間が経ち、古い情報になっている可能性があります。あらかじめご了承ください。
 
@@ -53,8 +53,8 @@ WITH
 このデータ量や用途に合わせて指定していくことが、Dedicated SQL Pool を使用する上で重要になります。
 
 1 つ目の`DISTRIBUTION = ROUND_ROBIN`の部分では、データをどのようなルールに従って分散させるか指定しています。
-インターフェイス上では 1 つのテーブルとして扱われていますが、裏側で 60 個のコンピュートノードにデータを分散させています。
-Dedicated SQL Pool は Massively Parallel Processing Database と呼ばれるデータベースであり、Big なデータを効率よく処理できるよう設計されています。
+Dedicated SQL Pool は、インターフェイス上では 1 つのテーブルとして扱われていますが、裏側で 60 個のコンピュートノードにデータを分散させています。
+Dedicated SQL Pool は Massively Parallel Processing Database と呼ばれるものの一種であり、Big なデータを効率よく処理できるよう設計されています。
 一方で、ノード間での無駄なデータ移動や、ノードごとのデータ量がなるべく均一になるように気を遣う必要もあります。
 
 2 つ目の`CLUSTERED COLUMNSTORE INDEX`と書いてある部分では、テーブルの Index について指定できます。
