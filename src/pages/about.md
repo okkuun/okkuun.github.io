@@ -7,6 +7,13 @@ I'm [@okkuun](https://github.com/okkuun) (Takafumi Okukubo).<br>
 Currently, I work at a Japanese company as a data analytics engineer.<br>
 My interests include DataOps, dbt, and probabilistic modeling.
 
+## My Accounts
+
+- Email: taka.okukubo[at]gmail.com
+- [Twitter](https://twitter.com/green_j_eans)
+- [GitHub](https://github.com/okkuun)
+- [note](https://note.com/okkuun)
+
 ## Skills
 
 - Python, R, SQL
@@ -14,10 +21,15 @@ My interests include DataOps, dbt, and probabilistic modeling.
 - Tableau
 - Probabilistic modeling, Bayesian inference
 
-## Educations
+## Education
 
 - March 2021, Master’s degree in Service Science, University of Tsukuba.
 - March 2019, Bachelor's degree in Science and Engineering, University of Tsukuba.
+
+## Work Experience
+
+- Data Scientist, Yamato Transport Co.,Ltd. (April 2021 - April 2023)
+- Reserch Assistant, National Institute of Advanced Industrial Science and Technology (AIST). (July 2019 - March 2021)
 
 ## Publications
 
